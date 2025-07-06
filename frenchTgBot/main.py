@@ -1,18 +1,27 @@
-from aiogram import Bot, Dispathcer, types
-from aiogram.types import Message
-from aiogram.utils import executor
-from dotenv import load_dotenv
+import asyncio
 import os
+from aiogram import Bot, Dispatcher, types
+from aiogram.types import Message
+from aiogram.enums import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.utils.markdown import hbold
+from dotenv import load_dotenv
+
 
 #donwload .env
 load_dotenv ()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-dp = Dispathcer(Bot)
+
+bot = Bot(token=BOT_TOKEN, parse_mode=ParseMode.HTML)
+dp = Dispatcher(storage=MemoryStorage())
 
 #start
-@dp.message_handler(commands=[' start '])
-async def start(message: Message) :
-    await message.answer("Hi! Я допоможу тобі!")
+@dp.message(commands=[' start '])
+async def start_heandler(message: Message) :
+    await message.answer(f"{hbold("HI")} я поможу тобі вивч слова")
+
+async def main():
+    await dp.start_polling(bot)
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates = True)
+    asyncio.run(main())
