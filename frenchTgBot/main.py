@@ -16,7 +16,7 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
 #start
-@dp.message(commands=[' start '])
+@dp.message(lambda msg: msg.text == "/start")
 async def start_heandler(message: Message) :
     await message.answer(f"{hbold("HI")} я поможу тобі вивч слова", parse_mode=ParseMode.HTML )
 
