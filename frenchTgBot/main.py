@@ -18,7 +18,7 @@ dp = Dispatcher(storage=MemoryStorage())
 #start
 @dp.message(commands=[' start '])
 async def start_heandler(message: Message) :
-    await message.answer(f"{hbold("HI")} я поможу тобі вивч слова")
+    await message.answer(f"{hbold("HI")} я поможу тобі вивч слова", parse_mode=ParseMode.HTML )
 
 async def main():
     await dp.start_polling(bot)
