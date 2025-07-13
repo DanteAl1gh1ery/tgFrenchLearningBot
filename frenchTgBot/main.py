@@ -6,7 +6,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.markdown import hbold
 from dotenv import load_dotenv
-
+import db
 
 #donwload .env
 load_dotenv ()
