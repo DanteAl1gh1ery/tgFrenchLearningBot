@@ -23,5 +23,29 @@ async def start_heandler(message: Message) :
 async def main():
     await dp.start_polling(bot)
 
+# Add words
+@dp.message(lambda msg: msg.text.startswith("/addtoday"))
+async def add_word(message: Message):
+    try:
+        parts = message.text.split( " ", 3 )
+        if len(parts) < 4:
+            await message.answer("Форимат: /addtoday слово переклад транскрипція")
+            return
+        
+        word, translation, transcription = parts[1], parts[2], parts[3]
+        user_id = message.from_user.id
+
+        conn = sqlite3.connect("words.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO words (user_id, word, translation, transcription) VALUES (?, ?, ?, ?) ",
+           (user_id, word, translation, transcription))
+        conn.commit()
+        conn.close()
+
+        await message.answer(f"✅ Додано: {word} — {translation} [{transcription}]")
+
+    except Exception as e:
+        await message.answer(f"❌ Помилка: {e}")
+
 if __name__ == '__main__':
     asyncio.run(main())
