@@ -7,8 +7,9 @@ from dotenv import load_dotenv
 
 # Імпортуємо наш роутер з хендлерами
 from handlers import router as main_router
-
+import database
 async def main():
+    database.init_db()
     # Завантажуємо змінні середовища
     load_dotenv()
     bot_token = os.getenv("BOT_TOKEN")
