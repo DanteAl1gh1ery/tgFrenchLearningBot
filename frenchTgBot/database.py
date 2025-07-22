@@ -58,6 +58,33 @@ def add_word(user_id: int, word: str, translation: str, transcription: str) -> i
     except sqlite3.Error as e:
         print(f"Помилка при додаванні слова: {e}")
         return 0 # Повертаємо 0 у випадку помилки
+    
+
+    finally:
+        if conn:
+            conn.close()
+
+# database.py
+
+# ... твій код з init_db та add_word ...
+
+def get_user_words(user_id: int):
+    """Повертає список слів для конкретного користувача."""
+    conn = None
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        
+        # Вибираємо всі потрібні поля і сортуємо за порядковим номером
+        cursor.execute(
+            "SELECT user_word_number, word, translation, transcription FROM words WHERE user_id = ? ORDER BY user_word_number ASC",
+            (user_id,)
+        )
+        return cursor.fetchall()  # Повертаємо всі знайдені рядки
+        
+    except sqlite3.Error as e:
+        print(f"Помилка при отриманні слів: {e}")
+        return [] # Повертаємо порожній список у разі помилки
     finally:
         if conn:
             conn.close()

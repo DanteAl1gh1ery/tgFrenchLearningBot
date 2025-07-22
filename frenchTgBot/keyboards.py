@@ -7,5 +7,7 @@ def get_main_menu():
     builder = InlineKeyboardBuilder()
     builder.button(text="✍️ Додати нове слово", callback_data="add_word")
     builder.button(text="🧠 Почати тренування", callback_data="start_training")
+    builder.button(text="📖 Мої слова", callback_data="my_words")
+
     builder.adjust(1)  # Кожна кнопка буде в новому рядку
     return builder.as_markup()

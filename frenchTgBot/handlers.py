@@ -74,3 +74,36 @@ async def transcription_entered(message: Message, state: FSMContext):
     
     # Завершуємо стан
     await state.clear()
+
+# Хендлер для натискання на кнопку "Мої слова"
+@router.callback_query(F.data == "my_words")
+async def show_user_words(callback: CallbackQuery):
+    #Відповідаємо колбек, що б зник годинник
+    await callback.answer()
+
+    user_id = callback.from_user.id
+    words = database.get_user_words(user_id)
+
+    if not words:
+        await callback.message.answer (
+            "У вас ще немає доданих слів. Натисніть '✍️ Додати нове слово', щоб почати!"
+        )
+        return
+    # Повідомлення зві списком слів
+    response_lines = ["📚 **Ваші слова:**\n"]
+    for word_data in words:
+        # word_data - це кортеж, наприклад (1, 'chat', 'кіт', '[ʃa]')
+        num, word, translation, transcription = word_data
+        response_lines.append(
+            f"{num}. **{word}** - {translation} *[{transcription}]*"
+        )
+        response_text = "\n".join(response_lines)
+        # HTML простіший і надійніший, замінимо на нього
+        html_response_lines = ["📚 <b>Ваші слова:</b>\n"]
+        for word_data in words:
+            num, word, translation, transcription = word_data
+            html_response_lines.append(
+            f"{num}. <b>{word}</b> - {translation} <i>[{transcription}]</i>"
+        )
+    
+    await callback.message.answer("\n".join(html_response_lines), parse_mode="HTML")
