@@ -1,19 +1,22 @@
-import sqlite3;
+# database.py
+import sqlite3
 
-conn = sqlite3.connect("words.db")
-cursor = conn.cursor()
+DB_NAME = "words.db"
 
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS words (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        word TEXT,
-        translation TEXT,
-        transcription TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        correct_count INTEGER DEFAULT 0,
-        incorrect_count INTEGER DEFAULT 0
-    )
-""")
+def add_word(user_id: int, word: str, translation: str, transcription: str):
+    """Додає нове слово в базу даних."""
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO words (user_id, word, translation, transcription) VALUES (?, ?, ?, ?)",
+            (user_id, word, translation, transcription)
+        )
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Помилка при додаванні слова: {e}")
+    finally:
+        if conn:
+            conn.close()
 
-conn.commit()
+# Тут можна додати інші функції: get_words, delete_word і т.д.
