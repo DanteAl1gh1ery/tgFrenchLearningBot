@@ -1,35 +1,39 @@
-# main.py
 import asyncio
+import logging
 import os
-from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import CommandStart, Command
+from aiogram.types import Message
+
+from aiogram import F
 from dotenv import load_dotenv
 
-# Імпортуємо наш роутер з хендлерами
-from handlers import router as main_router
-import database
-async def main():
-    database.init_db()
-    # Завантажуємо змінні середовища
-    load_dotenv()
-    bot_token = os.getenv("BOT_TOKEN")
+load_dotenv()
 
-    # Ініціалізуємо бота та диспетчер
-    bot = Bot(token=bot_token)
-    # MemoryStorage - простий спосіб зберігати стани FSM в оперативній пам'яті
-    dp = Dispatcher(storage=MemoryStorage()) 
+# Отримуємо токен з .env файлу
+TOKEN = os.getenv("BOT_TOKEN")
+if not TOKEN:
+    # Якщо токен не знайдено, програма зупиниться з зрозумілим повідомленням
+    raise ValueError("Токен не знайдено! Перевірте .env файл та імена змінних.")
 
-    # Підключаємо роутер до диспетчера
-    dp.include_router(main_router)
+dp =Dispatcher()
 
-    # Видаляємо старий вебхук, щоб уникнути конфліктів
-    await bot.delete_webhook(drop_pending_updates=True)
-    
-    # Запускаємо бота
+
+@dp.message(CommandStart())
+async def command_start_handler(message: Message) -> None:
+    await message.answer(f"Привіт,  {message.from_user.full_name}! Я бот створений для допомоги вивчення вакабуляру" )
+
+
+
+async def main() -> None:
+    # Ініціалізуємо бота з токеном
+    bot = Bot(TOKEN)
+    # Починаємо обробку апдейтів
     await dp.start_polling(bot)
 
-if __name__ == '__main__':
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        print("Бот зупинений.")
+if __name__ == "__main__":
+    # Налаштовуємо логування
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    # Запускаємо головну функцію
+    print("Бот запущений...")
+    asyncio.run(main())
