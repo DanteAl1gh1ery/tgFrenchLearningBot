@@ -2,38 +2,37 @@ import asyncio
 import logging
 import os
 from aiogram import Bot, Dispatcher, types
-from aiogram.filters import CommandStart, Command
-from aiogram.types import Message
-
-from aiogram import F
 from dotenv import load_dotenv
 
-load_dotenv()
 
-# Отримуємо токен з .env файлу
-TOKEN = os.getenv("BOT_TOKEN")
-if not TOKEN:
-    # Якщо токен не знайдено, програма зупиниться з зрозумілим повідомленням
-    raise ValueError("Токен не знайдено! Перевірте .env файл та імена змінних.")
-
-dp =Dispatcher()
-
-
-@dp.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
-    await message.answer(f"Привіт,  {message.from_user.full_name}! Я бот створений для допомоги вивчення вакабуляру" )
-
-
+#Роутер з файлу handlers.py
+from handlers import router as handlers_router
 
 async def main() -> None:
-    # Ініціалізуємо бота з токеном
+    load_dotenv()  # Start bot
+    TOKEN = os.getenv("BOT_TOKEN")
+    if not TOKEN:
+        logging.critical ("Token not found! Chek file .env")
+        return
+    
+    #initial bot and DP
     bot = Bot(TOKEN)
-    # Починаємо обробку апдейтів
+    dp = Dispatcher()
+
+    #Add router with hendlers to main DP
+    dp.include_router(handlers_router)
+
+    #Chek updates
     await dp.start_polling(bot)
 
+
 if __name__ == "__main__":
-    # Налаштовуємо логування
+    # Налаштовуємо логування для отримання інформації про роботу бота
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.info("Бот запущений...")
+    
     # Запускаємо головну функцію
-    print("Бот запущений...")
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logging.info("Роботу бота зупинено вручну.")
